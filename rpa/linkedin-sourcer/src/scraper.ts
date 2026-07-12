@@ -1,7 +1,14 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { Page } from 'playwright';
-import { DOWNLOADS_DIR, LINKEDIN_BASE, OUTPUT_DIR, randomDelay, sanitizeFilename } from './config.js';
+import {
+  assertLinkedInAllowedUrl,
+  DOWNLOADS_DIR,
+  LINKEDIN_BASE,
+  OUTPUT_DIR,
+  randomDelay,
+  sanitizeFilename,
+} from './config.js';
 import type { ScrapedProfile, StefaniniCompany } from './types.js';
 
 export async function ensureDirs(): Promise<void> {
@@ -11,6 +18,7 @@ export async function ensureDirs(): Promise<void> {
 
 export async function searchPeople(page: Page, query: string, maxResults: number): Promise<string[]> {
   const searchUrl = `${LINKEDIN_BASE}/search/results/people/?keywords=${encodeURIComponent(query)}&origin=GLOBAL_SEARCH_HEADER`;
+  assertLinkedInAllowedUrl(searchUrl, 'Busca LinkedIn');
   console.log(`Buscando: ${query}`);
   await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await randomDelay(2200, 3800);
@@ -25,6 +33,7 @@ export async function searchCompanyPeople(
 ): Promise<string[]> {
   const companyUrl = company.linkedinUrl || `${LINKEDIN_BASE}/company/${company.linkedinSlug}/`;
   const searchUrl = `${companyUrl.replace(/\/$/, '')}/people/?keywords=${encodeURIComponent(query)}`;
+  assertLinkedInAllowedUrl(searchUrl, `Empresa ${company.name}`);
   console.log(`Buscando em ${company.name}: ${query}`);
   await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await randomDelay(2400, 4200);
@@ -62,6 +71,7 @@ async function collectProfileUrls(page: Page, maxResults: number): Promise<strin
 
 export async function scrapeProfile(page: Page, profileUrl: string): Promise<ScrapedProfile | null> {
   try {
+    assertLinkedInAllowedUrl(profileUrl, 'Perfil LinkedIn');
     await page.goto(profileUrl, { waitUntil: 'domcontentloaded', timeout: 50000 });
     await randomDelay(2200, 4200);
     await page.evaluate(() => window.scrollBy(0, window.innerHeight));

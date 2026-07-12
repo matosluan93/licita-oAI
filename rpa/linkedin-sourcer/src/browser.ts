@@ -1,14 +1,30 @@
 import { chromium, type BrowserContext, type Page } from 'playwright';
-import { LINKEDIN_BASE, SESSION_DIR } from './config.js';
+import { isLinkedInAllowedUrl, LINKEDIN_BASE, SESSION_DIR } from './config.js';
 
 export async function launchBrowser(headless = false): Promise<BrowserContext> {
-  return chromium.launchPersistentContext(SESSION_DIR, {
+  const context = await chromium.launchPersistentContext(SESSION_DIR, {
     headless,
     viewport: { width: 1280, height: 900 },
     acceptDownloads: true,
     slowMo: headless ? 0 : 60,
     userAgent:
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  });
+  await installLinkedInOnlyGuard(context);
+  return context;
+}
+
+async function installLinkedInOnlyGuard(context: BrowserContext): Promise<void> {
+  await context.route('**/*', route => {
+    const request = route.request();
+    const url = request.url();
+
+    if (isLinkedInAllowedUrl(url)) {
+      return route.continue();
+    }
+
+    console.warn(`Bloqueado acesso fora do LinkedIn: ${url}`);
+    return route.abort();
   });
 }
 

@@ -29,6 +29,10 @@ O RPA usa os links oficiais de empresas no LinkedIn exportados pela aplicacao, a
 ele tambem coleta links `/company/...` presentes no perfil e so salva candidatos que batem
 com os slugs oficiais ou com os aliases configurados.
 
+O navegador do RPA e bloqueado para acessar apenas dominios do LinkedIn e os assets oficiais
+necessarios da propria plataforma (`linkedin.com` e `licdn.com`). Ele nao navega em
+OneDrive, SharePoint, Google ou outros sites.
+
 O resultado fica em dois arquivos:
 
 - `output/results-<campaignId>.json`, para importar na tela `/linkedin-sourcing`.

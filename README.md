@@ -27,6 +27,9 @@ O RPA gera dois arquivos em `rpa/linkedin-sourcer/output/`:
 - `results-<campaignId>.json`, para reimportar na aplicacao.
 - `licitacao-<campaignId>.xlsx`, com resumo da licitacao, cargos solicitados, quantidades e links dos perfis.
 
+As buscas do navegador ficam restritas ao LinkedIn. O RPA bloqueia acesso fora de
+`linkedin.com` e `licdn.com`; ele nao entra em OneDrive/SharePoint pela web.
+
 A estrutura de documentos nao deve ficar dentro do projeto. Por padrao, o destino e:
 
 ```text
