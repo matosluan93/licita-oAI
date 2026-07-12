@@ -12,10 +12,18 @@ Aplicacao para analisar editais, configurar campanhas de sourcing no LinkedIn, e
 6. Rode o RPA em `rpa/linkedin-sourcer`; ele busca nas paginas `/company/<slug>/people/`.
 7. Use `output/licitacao-<campaignId>.xlsx` no Excel ou importe `output/results-<campaignId>.json` na tela.
 
-O RPA tambem gera uma estrutura local para upload posterior no OneDrive:
+## Pasta de documentos
+
+A estrutura de documentacao fica fora do projeto:
 
 ```text
-output/Pregões 2026/Julho/<Cliente>/<Perfil>/<Profissional>/
+C:\Users\<seu-usuario>\Documents\LicitAI\Pregoes 2026\Julho\<Cliente>\<Perfil>\<Profissional>\
+```
+
+Para gravar direto no OneDrive/SharePoint sincronizado localmente, rode o RPA com:
+
+```bash
+npm run search -- --config caminho/para/linkedin-campaign.json --documents-root "C:\Users\seu-usuario\OneDrive - Stefanini\Documents\Time Certificacoes\Pregoes"
 ```
 
 ## Variaveis
@@ -25,6 +33,7 @@ Copie `.env.example` para `.env` e preencha:
 ```bash
 OPENAI_API_KEY=sk-proj-sua-chave
 NEXT_PUBLIC_SITE_URL=http://localhost:4028
+LICITAI_DOCUMENTS_ROOT=C:\Users\seu-usuario\OneDrive - Stefanini\Documents\Time Certificacoes\Pregoes
 ```
 
 Sem `OPENAI_API_KEY`, a aplicacao usa uma extracao heuristica para testes.

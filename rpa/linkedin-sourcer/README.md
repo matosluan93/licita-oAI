@@ -34,15 +34,30 @@ O resultado fica em dois arquivos:
 - `output/results-<campaignId>.json`, para importar na tela `/linkedin-sourcing`.
 - `output/licitacao-<campaignId>.xlsx`, para abrir no Excel com abas de resumo, cargos e links dos perfis.
 
-Além disso, o LicitAI organiza os documentos na mesma lógica esperada para o OneDrive:
+## Pasta de documentos
+
+A estrutura `Pregoes 2026/Julho/<Cliente>/<Perfil>/<Profissional>/` nao fica dentro do projeto. Por padrao, ela e criada em:
 
 ```text
-output/Pregões 2026/Julho/<Cliente>/<Perfil>/<Profissional>/
+C:\Users\<seu-usuario>\Documents\LicitAI\Pregoes 2026\Julho\<Cliente>\<Perfil>\<Profissional>\
+```
+
+Para gravar direto na pasta sincronizada do OneDrive/SharePoint, passe o destino no comando:
+
+```bash
+npm run search -- --config caminho/para/linkedin-campaign.json --documents-root "C:\Users\seu-usuario\OneDrive - Stefanini\Documents\Time Certificacoes\Pregoes"
+```
+
+Ou defina a variavel de ambiente:
+
+```powershell
+$env:LICITAI_DOCUMENTS_ROOT="C:\Users\seu-usuario\OneDrive - Stefanini\Documents\Time Certificacoes\Pregoes"
+npm run search -- --config caminho/para/linkedin-campaign.json
 ```
 
 Cada pasta de profissional recebe:
 
-- currículo baixado, quando o LinkedIn disponibilizar o download;
+- curriculo baixado, quando o LinkedIn disponibilizar o download;
 - `perfil-linkedin.txt`, com nome, perfil solicitado, link do LinkedIn, empresa, headline e dados coletados.
 
 ## Cuidados

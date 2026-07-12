@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { OUTPUT_DIR, sanitizeFilename } from './config.js';
+import { DEFAULT_DOCUMENTS_ROOT, sanitizeFilename } from './config.js';
 import type { RequestedRole, RpaSearchConfig, ScrapedProfile } from './types.js';
 
 const MONTHS_PT_BR = [
@@ -26,7 +26,8 @@ export async function organizeDocumentationStructure(
   const yearFolder = `Pregões ${now.getFullYear()}`;
   const monthFolder = MONTHS_PT_BR[now.getMonth()];
   const clientFolder = safePathSegment(config.clientName || config.campaignName || 'Cliente não informado');
-  const baseDir = path.join(OUTPUT_DIR, yearFolder, monthFolder, clientFolder);
+  const documentsRoot = resolveDocumentsRoot(config);
+  const baseDir = path.join(documentsRoot, yearFolder, monthFolder, clientFolder);
   const roles = normalizeRoles(config);
   const assignments = assignProfilesToRoles(profiles, roles);
 
@@ -45,6 +46,14 @@ export async function organizeDocumentationStructure(
   }
 
   return baseDir;
+}
+
+function resolveDocumentsRoot(config: RpaSearchConfig): string {
+  return (
+    config.documentationRoot?.trim() ||
+    process.env.LICITAI_DOCUMENTS_ROOT?.trim() ||
+    DEFAULT_DOCUMENTS_ROOT
+  );
 }
 
 function normalizeRoles(config: RpaSearchConfig): RequestedRole[] {

@@ -27,10 +27,23 @@ O RPA gera dois arquivos em `rpa/linkedin-sourcer/output/`:
 - `results-<campaignId>.json`, para reimportar na aplicacao.
 - `licitacao-<campaignId>.xlsx`, com resumo da licitacao, cargos solicitados, quantidades e links dos perfis.
 
-Ele tambem cria uma estrutura local pronta para espelhar o OneDrive:
+A estrutura de documentos nao deve ficar dentro do projeto. Por padrao, o destino e:
 
 ```text
-rpa/linkedin-sourcer/output/Pregões 2026/Julho/<Cliente>/<Perfil>/<Profissional>/
+C:\Users\<seu-usuario>\Documents\LicitAI\Pregoes 2026\Julho\<Cliente>\<Perfil>\<Profissional>\
+```
+
+Para gravar direto na pasta sincronizada do OneDrive/SharePoint, informe o caminho no comando:
+
+```bash
+npm run search -- --config caminho/para/linkedin-campaign.json --documents-root "C:\Users\seu-usuario\OneDrive - Stefanini\Documents\Time Certificacoes\Pregoes"
+```
+
+Tambem e possivel definir a variavel de ambiente antes de executar:
+
+```powershell
+$env:LICITAI_DOCUMENTS_ROOT="C:\Users\seu-usuario\OneDrive - Stefanini\Documents\Time Certificacoes\Pregoes"
+npm run search -- --config caminho/para/linkedin-campaign.json
 ```
 
 Dentro da pasta de cada profissional ficam o curriculo baixado, quando houver, e um

@@ -1,3 +1,4 @@
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -6,6 +7,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 export const SESSION_DIR = path.join(dirname, '..', '.linkedin-session');
 export const OUTPUT_DIR = path.join(dirname, '..', 'output');
 export const DOWNLOADS_DIR = path.join(dirname, '..', 'downloads');
+export const DEFAULT_DOCUMENTS_ROOT = path.join(os.homedir(), 'Documents', 'LicitAI');
 export const LINKEDIN_BASE = 'https://www.linkedin.com';
 
 export function randomDelay(minMs: number, maxMs: number): Promise<void> {

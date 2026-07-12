@@ -7,19 +7,26 @@ import { organizeDocumentationStructure } from './oneDriveStructure.js';
 import { ensureDirs, saveResults, scrapeProfile, searchCompanyPeople, searchPeople } from './scraper.js';
 import type { RpaSearchConfig, StefaniniCompany } from './types.js';
 
-function parseArgs(): { configPath: string } {
+function parseArgs(): { configPath: string; documentsRoot?: string } {
   const args = process.argv.slice(2);
   const configIndex = args.indexOf('--config');
   if (configIndex === -1 || !args[configIndex + 1]) {
-    console.error('Uso: npm run search -- --config <caminho/campaign.json>');
+    console.error('Uso: npm run search -- --config <caminho/campaign.json> [--documents-root <pasta>]');
     process.exit(1);
   }
-  return { configPath: args[configIndex + 1] };
+
+  const documentsRootIndex = args.indexOf('--documents-root');
+  const documentsRoot = documentsRootIndex >= 0 ? args[documentsRootIndex + 1] : undefined;
+
+  return { configPath: args[configIndex + 1], documentsRoot };
 }
 
 async function main() {
-  const { configPath } = parseArgs();
+  const { configPath, documentsRoot } = parseArgs();
   const config = JSON.parse(await fs.readFile(configPath, 'utf-8')) as RpaSearchConfig;
+  if (documentsRoot) {
+    config.documentationRoot = documentsRoot;
+  }
 
   console.log(`Campanha: ${config.campaignName}`);
   console.log(`ID: ${config.campaignId}`);
