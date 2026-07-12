@@ -63,6 +63,7 @@ export interface LinkedInProfileResult {
 export interface RpaSearchConfig {
   campaignId: string;
   campaignName: string;
+  clientName: string;
   requirements: EditalRequirements;
   companies: StefaniniCompany[];
   maxProfiles: number;

@@ -12,6 +12,12 @@ Aplicacao para analisar editais, configurar campanhas de sourcing no LinkedIn, e
 6. Rode o RPA em `rpa/linkedin-sourcer`; ele busca nas paginas `/company/<slug>/people/`.
 7. Use `output/licitacao-<campaignId>.xlsx` no Excel ou importe `output/results-<campaignId>.json` na tela.
 
+O RPA tambem gera uma estrutura local para upload posterior no OneDrive:
+
+```text
+output/Pregões 2026/Julho/<Cliente>/<Perfil>/<Profissional>/
+```
+
 ## Variaveis
 
 Copie `.env.example` para `.env` e preencha:

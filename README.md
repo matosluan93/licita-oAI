@@ -27,6 +27,15 @@ O RPA gera dois arquivos em `rpa/linkedin-sourcer/output/`:
 - `results-<campaignId>.json`, para reimportar na aplicacao.
 - `licitacao-<campaignId>.xlsx`, com resumo da licitacao, cargos solicitados, quantidades e links dos perfis.
 
+Ele tambem cria uma estrutura local pronta para espelhar o OneDrive:
+
+```text
+rpa/linkedin-sourcer/output/Pregões 2026/Julho/<Cliente>/<Perfil>/<Profissional>/
+```
+
+Dentro da pasta de cada profissional ficam o curriculo baixado, quando houver, e um
+`perfil-linkedin.txt` com os dados e link do perfil.
+
 ## Estrutura
 
 - `src/app/linkedin-sourcing`: interface principal, com upload de edital em PDF ou texto.

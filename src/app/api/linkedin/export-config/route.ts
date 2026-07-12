@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
     const {
       campaignId,
       campaignName,
+      clientName,
       requirements,
       companyIds,
       maxProfiles = 25,
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
     const config: RpaSearchConfig = {
       campaignId: campaignId || `campaign-${Date.now()}`,
       campaignName: campaignName || requirements.cargo || 'Campanha LinkedIn',
+      clientName: clientName || campaignName || requirements.cargo || 'Cliente nao informado',
       requirements,
       companies: getCompaniesByIds(companyIds),
       maxProfiles: Math.min(50, Math.max(1, Number(maxProfiles) || 25)),

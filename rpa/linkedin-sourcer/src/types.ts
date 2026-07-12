@@ -30,6 +30,7 @@ export interface StefaniniCompany {
 export interface RpaSearchConfig {
   campaignId: string;
   campaignName: string;
+  clientName: string;
   requirements: EditalRequirements;
   companies: StefaniniCompany[];
   maxProfiles: number;

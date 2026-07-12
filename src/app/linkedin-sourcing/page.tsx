@@ -42,6 +42,7 @@ export default function LinkedInSourcingPage() {
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>(defaultSelectedCompanies);
   const [requirements, setRequirements] = useState<EditalRequirements | null>(null);
   const [campaignName, setCampaignName] = useState('Campanha Full Stack Senior');
+  const [clientName, setClientName] = useState('');
   const [maxProfiles, setMaxProfiles] = useState(25);
   const [delayBetweenProfilesMs, setDelayBetweenProfilesMs] = useState(3500);
   const [headless, setHeadless] = useState(false);
@@ -95,6 +96,7 @@ export default function LinkedInSourcingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           campaignName,
+          clientName,
           requirements,
           companyIds: selectedCompanies,
           maxProfiles,
@@ -322,6 +324,15 @@ export default function LinkedInSourcingPage() {
                     <input
                       value={campaignName}
                       onChange={event => setCampaignName(event.target.value)}
+                      className="mt-1 h-10 w-full rounded border border-line bg-white px-3 text-sm"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-semibold text-ink">Cliente da licitação</span>
+                    <input
+                      value={clientName}
+                      onChange={event => setClientName(event.target.value)}
+                      placeholder="Ex: Banco ABC, Prefeitura de..."
                       className="mt-1 h-10 w-full rounded border border-line bg-white px-3 text-sm"
                     />
                   </label>

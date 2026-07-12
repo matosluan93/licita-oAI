@@ -46,6 +46,7 @@ function addResumoSheet(
   sheet.addRow(['Campo', 'Valor']);
   sheet.addRows([
     ['Licitação/Campanha', config.campaignName],
+    ['Cliente', config.clientName || 'Cliente não informado'],
     ['ID', config.campaignId],
     ['Gerado em', new Date()],
     ['Empresas pesquisadas', config.companies.map(company => company.name).join(', ')],
@@ -57,7 +58,7 @@ function addResumoSheet(
 
   styleHeader(sheet.getRow(1));
   sheet.getColumn('valor').alignment = { wrapText: true, vertical: 'top' };
-  sheet.getCell('B4').numFmt = 'yyyy-mm-dd hh:mm';
+  sheet.getCell('B5').numFmt = 'yyyy-mm-dd hh:mm';
 }
 
 function addCargosSheet(
@@ -90,6 +91,7 @@ function addPerfisSheet(workbook: ExcelJS.Workbook, config: RpaSearchConfig, pro
   const sheet = workbook.addWorksheet('Perfis', { views: [{ state: 'frozen', ySplit: 1 }] });
   sheet.columns = [
     { header: 'Licitação/Campanha', key: 'campaign', width: 30 },
+    { header: 'Cliente', key: 'client', width: 30 },
     { header: 'Cargo solicitado', key: 'role', width: 34 },
     { header: 'Nome', key: 'name', width: 30 },
     { header: 'Headline', key: 'headline', width: 52 },
@@ -106,6 +108,7 @@ function addPerfisSheet(workbook: ExcelJS.Workbook, config: RpaSearchConfig, pro
   for (const profile of profiles) {
     const row = sheet.addRow({
       campaign: config.campaignName,
+      client: config.clientName || 'Cliente não informado',
       role: roleName,
       name: profile.name,
       headline: profile.headline,
@@ -135,7 +138,7 @@ function addPerfisSheet(workbook: ExcelJS.Workbook, config: RpaSearchConfig, pro
   styleHeader(sheet.getRow(1));
   sheet.getColumn('headline').alignment = { wrapText: true, vertical: 'top' };
   sheet.getColumn('scrapedAt').numFmt = 'yyyy-mm-dd hh:mm';
-  sheet.autoFilter = 'A1:J1';
+  sheet.autoFilter = 'A1:K1';
 }
 
 function styleHeader(row: ExcelJS.Row) {

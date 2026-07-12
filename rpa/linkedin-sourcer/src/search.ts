@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import { isLoggedIn, launchBrowser } from './browser.js';
 import { randomDelay } from './config.js';
 import { saveExcelReport } from './excelReport.js';
+import { organizeDocumentationStructure } from './oneDriveStructure.js';
 import { ensureDirs, saveResults, scrapeProfile, searchCompanyPeople, searchPeople } from './scraper.js';
 import type { RpaSearchConfig, StefaniniCompany } from './types.js';
 
@@ -78,8 +79,10 @@ async function main() {
 
     const outputPath = await saveResults(config.campaignId, profiles);
     const excelPath = await saveExcelReport(config, profiles);
+    const documentationPath = await organizeDocumentationStructure(config, profiles);
     console.log(`Concluido. JSON gerado: ${outputPath}`);
     console.log(`Excel gerado: ${excelPath}`);
+    console.log(`Estrutura de documentacao gerada: ${documentationPath}`);
   } finally {
     await context.close();
   }
