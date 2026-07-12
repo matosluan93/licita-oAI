@@ -8,7 +8,9 @@ import {
   appendAuditEvent,
   assertPageIsSafe,
   ensureDailyAllowance,
+  getRemainingSavedProfilesToday,
   getEffectiveProfileLimit,
+  recordSavedProfile,
   recordProfileVisit,
   resolveSafetyConfig,
   restIfNeeded,
@@ -123,7 +125,14 @@ async function main() {
       const matchesCompany = belongsToSelectedCompanies(profile, config.companies);
 
       if (matchesCompany) {
+        const remainingSavedToday = await getRemainingSavedProfilesToday(safety);
+        if (remainingSavedToday <= 0) {
+          console.log('Limite diario de perfis salvos atingido. Encerrando execucao com os resultados atuais.');
+          break;
+        }
+
         profiles.push(profile);
+        await recordSavedProfile();
         console.log(`Salvo: ${profile.name}`);
       } else {
         console.log(`Ignorado por empresa: ${profile.name}`);

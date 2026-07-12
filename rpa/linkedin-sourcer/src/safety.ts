@@ -6,7 +6,7 @@ import type { RpaSafetyConfig, RpaSearchConfig } from './types.js';
 
 const DEFAULT_SAFETY: RpaSafetyConfig = {
   maxProfilesPerRun: 30,
-  dailyProfileLimit: 80,
+  dailyProfileLimit: 100,
   pauseEveryProfiles: 8,
   pauseBetweenBatchesMs: 90000,
   downloadResumes: true,
@@ -17,6 +17,7 @@ const DEFAULT_SAFETY: RpaSafetyConfig = {
 interface DailyUsage {
   date: string;
   profilesVisited: number;
+  profilesSaved: number;
 }
 
 export function resolveSafetyConfig(config: RpaSearchConfig): RpaSafetyConfig {
@@ -34,17 +35,17 @@ export function resolveSafetyConfig(config: RpaSearchConfig): RpaSafetyConfig {
 }
 
 export function getEffectiveProfileLimit(config: RpaSearchConfig, safety: RpaSafetyConfig): number {
-  return Math.min(config.maxProfiles, safety.maxProfilesPerRun, safety.dailyProfileLimit);
+  return Math.min(config.maxProfiles, safety.maxProfilesPerRun);
 }
 
 export async function ensureDailyAllowance(safety: RpaSafetyConfig, requestedProfiles: number): Promise<number> {
   const usage = await readDailyUsage();
-  const remaining = Math.max(0, safety.dailyProfileLimit - usage.profilesVisited);
+  const remaining = Math.max(0, safety.dailyProfileLimit - usage.profilesSaved);
   const allowed = Math.min(requestedProfiles, remaining);
 
   if (allowed <= 0) {
     throw new Error(
-      `Limite diario conservador atingido (${usage.profilesVisited}/${safety.dailyProfileLimit} perfis). Tente novamente amanha.`
+      `Limite diario conservador atingido (${usage.profilesSaved}/${safety.dailyProfileLimit} perfis salvos). Tente novamente amanha.`
     );
   }
 
@@ -59,6 +60,17 @@ export async function recordProfileVisit(): Promise<void> {
   const usage = await readDailyUsage();
   usage.profilesVisited += 1;
   await fs.writeFile(getUsagePath(), JSON.stringify(usage, null, 2), 'utf-8');
+}
+
+export async function recordSavedProfile(): Promise<void> {
+  const usage = await readDailyUsage();
+  usage.profilesSaved += 1;
+  await fs.writeFile(getUsagePath(), JSON.stringify(usage, null, 2), 'utf-8');
+}
+
+export async function getRemainingSavedProfilesToday(safety: RpaSafetyConfig): Promise<number> {
+  const usage = await readDailyUsage();
+  return Math.max(0, safety.dailyProfileLimit - usage.profilesSaved);
 }
 
 export async function restIfNeeded(processedProfiles: number, safety: RpaSafetyConfig): Promise<void> {
@@ -93,14 +105,19 @@ export async function appendAuditEvent(event: Record<string, unknown>): Promise<
 async function readDailyUsage(): Promise<DailyUsage> {
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
   const today = new Date().toISOString().slice(0, 10);
-  const fallback: DailyUsage = { date: today, profilesVisited: 0 };
+  const fallback: DailyUsage = { date: today, profilesVisited: 0, profilesSaved: 0 };
 
   const raw = await fs.readFile(getUsagePath(), 'utf-8').catch(() => '');
   if (!raw) return fallback;
 
   try {
     const parsed = JSON.parse(raw) as DailyUsage;
-    return parsed.date === today ? parsed : fallback;
+    if (parsed.date !== today) return fallback;
+    return {
+      date: parsed.date,
+      profilesVisited: Number(parsed.profilesVisited) || 0,
+      profilesSaved: Number(parsed.profilesSaved) || 0,
+    };
   } catch {
     return fallback;
   }

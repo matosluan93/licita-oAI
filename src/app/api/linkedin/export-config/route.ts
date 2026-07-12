@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       headless: Boolean(headless),
       safety: {
         maxProfilesPerRun: Math.min(35, Math.max(1, Number(safety.maxProfilesPerRun) || 30)),
-        dailyProfileLimit: Math.min(150, Math.max(1, Number(safety.dailyProfileLimit) || 80)),
+        dailyProfileLimit: Math.min(150, Math.max(1, Number(safety.dailyProfileLimit) || 100)),
         pauseEveryProfiles: Math.min(20, Math.max(1, Number(safety.pauseEveryProfiles) || 8)),
         pauseBetweenBatchesMs: Math.min(
           10 * 60 * 1000,

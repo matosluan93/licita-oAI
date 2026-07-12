@@ -38,7 +38,7 @@ OneDrive, SharePoint, Google ou outros sites.
 Por padrao, o LicitAI aplica controles conservadores sem deixar o RPA inutilizavel:
 
 - ate 30 perfis por execucao;
-- ate 80 perfis por dia, registrados em `output/daily-usage.json`;
+- ate 100 perfis salvos por dia, registrados em `output/daily-usage.json`;
 - pausa maior a cada 8 perfis;
 - parada automatica em captcha, checkpoint ou verificacao de seguranca;
 - log de auditoria em `output/audit-log.ndjson`;
