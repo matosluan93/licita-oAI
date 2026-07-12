@@ -12,8 +12,9 @@ export async function POST(request: NextRequest) {
       requirements,
       companyIds,
       maxProfiles = 25,
-      delayBetweenProfilesMs = 3500,
+      delayBetweenProfilesMs = 6500,
       headless = false,
+      safety = {},
     } = body;
 
     if (!requirements || !companyIds?.length) {
@@ -27,8 +28,20 @@ export async function POST(request: NextRequest) {
       requirements,
       companies: getCompaniesByIds(companyIds),
       maxProfiles: Math.min(50, Math.max(1, Number(maxProfiles) || 25)),
-      delayBetweenProfilesMs: Math.max(2500, Number(delayBetweenProfilesMs) || 3500),
+      delayBetweenProfilesMs: Math.max(5000, Number(delayBetweenProfilesMs) || 6500),
       headless: Boolean(headless),
+      safety: {
+        maxProfilesPerRun: Math.min(35, Math.max(1, Number(safety.maxProfilesPerRun) || 30)),
+        dailyProfileLimit: Math.min(150, Math.max(1, Number(safety.dailyProfileLimit) || 80)),
+        pauseEveryProfiles: Math.min(20, Math.max(1, Number(safety.pauseEveryProfiles) || 8)),
+        pauseBetweenBatchesMs: Math.min(
+          10 * 60 * 1000,
+          Math.max(30000, Number(safety.pauseBetweenBatchesMs) || 90000)
+        ),
+        downloadResumes: safety.downloadResumes !== false,
+        confirmBeforeResumeDownload: Boolean(safety.confirmBeforeResumeDownload),
+        stopOnCheckpoint: safety.stopOnCheckpoint !== false,
+      },
     };
 
     return NextResponse.json(config);

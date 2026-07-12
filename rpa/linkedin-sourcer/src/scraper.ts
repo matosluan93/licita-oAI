@@ -1,5 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import readline from 'node:readline/promises';
+import { stdin as input, stdout as output } from 'node:process';
 import type { Page } from 'playwright';
 import {
   assertLinkedInAllowedUrl,
@@ -9,41 +11,57 @@ import {
   randomDelay,
   sanitizeFilename,
 } from './config.js';
-import type { ScrapedProfile, StefaniniCompany } from './types.js';
+import { assertPageIsSafe } from './safety.js';
+import type { RpaSafetyConfig, ScrapedProfile, StefaniniCompany } from './types.js';
+
+interface ScrapeProfileOptions {
+  downloadResumes: boolean;
+  confirmBeforeResumeDownload: boolean;
+  safety: RpaSafetyConfig;
+}
 
 export async function ensureDirs(): Promise<void> {
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
   await fs.mkdir(DOWNLOADS_DIR, { recursive: true });
 }
 
-export async function searchPeople(page: Page, query: string, maxResults: number): Promise<string[]> {
+export async function searchPeople(
+  page: Page,
+  query: string,
+  maxResults: number,
+  safety: RpaSafetyConfig
+): Promise<string[]> {
   const searchUrl = `${LINKEDIN_BASE}/search/results/people/?keywords=${encodeURIComponent(query)}&origin=GLOBAL_SEARCH_HEADER`;
   assertLinkedInAllowedUrl(searchUrl, 'Busca LinkedIn');
   console.log(`Buscando: ${query}`);
   await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await assertPageIsSafe(page, 'busca booleana', safety);
   await randomDelay(2200, 3800);
-  return collectProfileUrls(page, maxResults);
+  return collectProfileUrls(page, maxResults, safety);
 }
 
 export async function searchCompanyPeople(
   page: Page,
   company: StefaniniCompany,
   query: string,
-  maxResults: number
+  maxResults: number,
+  safety: RpaSafetyConfig
 ): Promise<string[]> {
   const companyUrl = company.linkedinUrl || `${LINKEDIN_BASE}/company/${company.linkedinSlug}/`;
   const searchUrl = `${companyUrl.replace(/\/$/, '')}/people/?keywords=${encodeURIComponent(query)}`;
   assertLinkedInAllowedUrl(searchUrl, `Empresa ${company.name}`);
   console.log(`Buscando em ${company.name}: ${query}`);
   await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await assertPageIsSafe(page, `busca na empresa ${company.name}`, safety);
   await randomDelay(2400, 4200);
-  return collectProfileUrls(page, maxResults);
+  return collectProfileUrls(page, maxResults, safety);
 }
 
-async function collectProfileUrls(page: Page, maxResults: number): Promise<string[]> {
+async function collectProfileUrls(page: Page, maxResults: number, safety: RpaSafetyConfig): Promise<string[]> {
   const profileUrls = new Set<string>();
 
   for (let cycle = 0; cycle < 8 && profileUrls.size < maxResults; cycle++) {
+    await assertPageIsSafe(page, 'coleta de links', safety);
     const links = await page.$$eval('a[href*="/in/"]', (anchors: HTMLAnchorElement[]) =>
       anchors
         .map((anchor: HTMLAnchorElement) => anchor.href.split('?')[0])
@@ -69,10 +87,15 @@ async function collectProfileUrls(page: Page, maxResults: number): Promise<strin
   return Array.from(profileUrls).slice(0, maxResults);
 }
 
-export async function scrapeProfile(page: Page, profileUrl: string): Promise<ScrapedProfile | null> {
+export async function scrapeProfile(
+  page: Page,
+  profileUrl: string,
+  options: ScrapeProfileOptions
+): Promise<ScrapedProfile | null> {
   try {
     assertLinkedInAllowedUrl(profileUrl, 'Perfil LinkedIn');
     await page.goto(profileUrl, { waitUntil: 'domcontentloaded', timeout: 50000 });
+    await assertPageIsSafe(page, 'leitura de perfil', options.safety);
     await randomDelay(2200, 4200);
     await page.evaluate(() => window.scrollBy(0, window.innerHeight));
     await randomDelay(900, 1500);
@@ -103,7 +126,9 @@ export async function scrapeProfile(page: Page, profileUrl: string): Promise<Scr
 
     const companySlugs = await extractCompanySlugs(page);
     const company = inferCompany(experience, headline);
-    const resume = await tryDownloadResume(page, name);
+    const resume = options.downloadResumes
+      ? await tryDownloadResume(page, name, options.confirmBeforeResumeDownload)
+      : { resumeDownloaded: false };
 
     return {
       name,
@@ -174,7 +199,11 @@ async function extractCompanySlugs(page: Page): Promise<string[]> {
   ];
 }
 
-async function tryDownloadResume(page: Page, name: string): Promise<{ resumeUrl?: string; resumeDownloaded: boolean }> {
+async function tryDownloadResume(
+  page: Page,
+  name: string,
+  confirmBeforeDownload: boolean
+): Promise<{ resumeUrl?: string; resumeDownloaded: boolean }> {
   const moreButton = page.locator('button[aria-label*="Mais"], button[aria-label*="More"]').first();
   if (await moreButton.isVisible().catch(() => false)) {
     await moreButton.click().catch(() => undefined);
@@ -189,6 +218,10 @@ async function tryDownloadResume(page: Page, name: string): Promise<{ resumeUrl?
   let resumeUrl = (await resumeLink.getAttribute('href').catch(() => undefined)) || undefined;
   if (resumeUrl && !resumeUrl.startsWith('http')) resumeUrl = `${LINKEDIN_BASE}${resumeUrl}`;
 
+  if (confirmBeforeDownload && !(await confirmDownload(name))) {
+    return { resumeUrl, resumeDownloaded: false };
+  }
+
   const downloadPromise = page.waitForEvent('download', { timeout: 8000 }).catch(() => null);
   await resumeLink.click().catch(() => undefined);
   const download = await downloadPromise;
@@ -198,4 +231,14 @@ async function tryDownloadResume(page: Page, name: string): Promise<{ resumeUrl?
   const savePath = path.join(DOWNLOADS_DIR, `${sanitizeFilename(name)}-curriculo.pdf`);
   await download.saveAs(savePath);
   return { resumeUrl: savePath, resumeDownloaded: true };
+}
+
+async function confirmDownload(name: string): Promise<boolean> {
+  const rl = readline.createInterface({ input, output });
+  try {
+    const answer = await rl.question(`Baixar curriculo de ${name}? [s/N] `);
+    return ['s', 'sim', 'y', 'yes'].includes(answer.trim().toLowerCase());
+  } finally {
+    rl.close();
+  }
 }

@@ -64,11 +64,23 @@ export interface RpaSearchConfig {
   campaignId: string;
   campaignName: string;
   clientName: string;
+  documentationRoot?: string;
   requirements: EditalRequirements;
   companies: StefaniniCompany[];
   maxProfiles: number;
   delayBetweenProfilesMs: number;
   headless: boolean;
+  safety?: Partial<RpaSafetyConfig>;
+}
+
+export interface RpaSafetyConfig {
+  maxProfilesPerRun: number;
+  dailyProfileLimit: number;
+  pauseEveryProfiles: number;
+  pauseBetweenBatchesMs: number;
+  downloadResumes: boolean;
+  confirmBeforeResumeDownload: boolean;
+  stopOnCheckpoint: boolean;
 }
 
 export interface RpaExportPayload {

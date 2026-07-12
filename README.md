@@ -30,6 +30,12 @@ O RPA gera dois arquivos em `rpa/linkedin-sourcer/output/`:
 As buscas do navegador ficam restritas ao LinkedIn. O RPA bloqueia acesso fora de
 `linkedin.com` e `licdn.com`; ele nao entra em OneDrive/SharePoint pela web.
 
+O modo responsavel vem ativo por padrao: limite de 30 perfis por execucao, limite
+diario de 80 perfis, pausa maior a cada 8 perfis, parada em captcha/checkpoint e
+log de auditoria em `rpa/linkedin-sourcer/output/audit-log.ndjson`. Para rodar sem
+baixar curriculos, use `--no-resume-downloads`; para aprovar cada download, use
+`--confirm-downloads`.
+
 A estrutura de documentos nao deve ficar dentro do projeto. Por padrao, o destino e:
 
 ```text

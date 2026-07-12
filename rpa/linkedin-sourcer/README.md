@@ -33,6 +33,27 @@ O navegador do RPA e bloqueado para acessar apenas dominios do LinkedIn e os ass
 necessarios da propria plataforma (`linkedin.com` e `licdn.com`). Ele nao navega em
 OneDrive, SharePoint, Google ou outros sites.
 
+## Modo responsavel
+
+Por padrao, o LicitAI aplica controles conservadores sem deixar o RPA inutilizavel:
+
+- ate 30 perfis por execucao;
+- ate 80 perfis por dia, registrados em `output/daily-usage.json`;
+- pausa maior a cada 8 perfis;
+- parada automatica em captcha, checkpoint ou verificacao de seguranca;
+- log de auditoria em `output/audit-log.ndjson`;
+- downloads de curriculo habilitados, mas podem ser desligados.
+
+Flags uteis:
+
+```bash
+npm run search -- --config caminho/para/linkedin-campaign.json --no-resume-downloads
+npm run search -- --config caminho/para/linkedin-campaign.json --confirm-downloads
+```
+
+Use `--no-resume-downloads` quando quiser gerar apenas Excel e links. Use
+`--confirm-downloads` quando quiser aprovar manualmente cada curriculo antes do download.
+
 O resultado fica em dois arquivos:
 
 - `output/results-<campaignId>.json`, para importar na tela `/linkedin-sourcing`.

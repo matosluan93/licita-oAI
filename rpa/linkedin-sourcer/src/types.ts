@@ -37,6 +37,17 @@ export interface RpaSearchConfig {
   maxProfiles: number;
   delayBetweenProfilesMs: number;
   headless: boolean;
+  safety?: Partial<RpaSafetyConfig>;
+}
+
+export interface RpaSafetyConfig {
+  maxProfilesPerRun: number;
+  dailyProfileLimit: number;
+  pauseEveryProfiles: number;
+  pauseBetweenBatchesMs: number;
+  downloadResumes: boolean;
+  confirmBeforeResumeDownload: boolean;
+  stopOnCheckpoint: boolean;
 }
 
 export interface ScrapedProfile {
