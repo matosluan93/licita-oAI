@@ -20,7 +20,11 @@ echo.
 echo Instalando dependencias do RPA LinkedIn...
 echo Pasta: %CD%
 echo.
-"%PNPM%" install
+if exist "%RPA_DIR%\node_modules\tsx\dist\cli.mjs" (
+  echo Dependencias do RPA ja encontradas. Pulando instalacao.
+) else (
+  call "%PNPM%" install --ignore-scripts
+)
 
 if not exist "%RPA_DIR%\node_modules\.bin\playwright.CMD" (
   echo.
@@ -32,7 +36,7 @@ if not exist "%RPA_DIR%\node_modules\.bin\playwright.CMD" (
 
 echo.
 echo Instalando Chromium do Playwright...
-"%RPA_DIR%\node_modules\.bin\playwright.CMD" install chromium
+call "%RPA_DIR%\node_modules\.bin\playwright.CMD" install chromium
 
 echo.
 echo Finalizado.

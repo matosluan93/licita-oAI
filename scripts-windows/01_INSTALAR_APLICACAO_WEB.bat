@@ -26,7 +26,11 @@ echo.
 echo Instalando dependencias da aplicacao web LicitAI...
 echo Pasta: %CD%
 echo.
-"%PNPM%" install
+if exist "%PROJECT_DIR%\node_modules\next\dist\bin\next" (
+  echo Dependencias ja encontradas. Pulando instalacao.
+) else (
+  call "%PNPM%" install --ignore-scripts
+)
 
 echo.
 if exist "%PROJECT_DIR%\node_modules\next\dist\bin\next" (

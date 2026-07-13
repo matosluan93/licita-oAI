@@ -33,7 +33,7 @@ echo Node encontrado:
 node -v
 echo.
 echo PNPM encontrado:
-"%PNPM%" -v
+call "%PNPM%" -v
 echo.
 echo Tudo certo para usar os scripts do LicitAI sem instalar Node globalmente.
 echo.
