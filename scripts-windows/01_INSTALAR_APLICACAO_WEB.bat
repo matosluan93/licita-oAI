@@ -29,5 +29,13 @@ echo.
 "%PNPM%" install
 
 echo.
+if exist "%PROJECT_DIR%\node_modules\next\dist\bin\next" (
+  echo Dependencias principais encontradas. Pode continuar.
+) else (
+  echo.
+  echo ATENCAO: A instalacao terminou, mas nao encontrei o Next em node_modules.
+  echo Copie as ultimas linhas acima e envie para analise.
+)
+
 echo Finalizado.
 pause

@@ -16,10 +16,19 @@ if not exist "%NODE_DIR%\node.exe" (
 set "PATH=%NODE_DIR%;%PATH%"
 cd /d "%RPA_DIR%"
 
+if not exist "%RPA_DIR%\node_modules\tsx\dist\cli.mjs" (
+  echo.
+  echo ERRO: Dependencias do RPA nao encontradas.
+  echo Rode primeiro: 03_INSTALAR_RPA_LINKEDIN.bat
+  echo.
+  pause
+  exit /b 1
+)
+
 echo.
 echo Abrindo navegador para login manual no LinkedIn...
 echo Faca login e aguarde o feed carregar.
 echo.
-"%PNPM%" run login
+"%NODE_DIR%\node.exe" "%RPA_DIR%\node_modules\tsx\dist\cli.mjs" src/login.ts
 
 pause

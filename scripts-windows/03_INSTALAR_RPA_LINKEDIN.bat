@@ -22,9 +22,17 @@ echo Pasta: %CD%
 echo.
 "%PNPM%" install
 
+if not exist "%RPA_DIR%\node_modules\.bin\playwright.CMD" (
+  echo.
+  echo ATENCAO: A instalacao terminou, mas nao encontrei o Playwright em node_modules.
+  echo Copie as ultimas linhas acima e envie para analise.
+  pause
+  exit /b 1
+)
+
 echo.
 echo Instalando Chromium do Playwright...
-"%PNPM%" exec playwright install chromium
+"%RPA_DIR%\node_modules\.bin\playwright.CMD" install chromium
 
 echo.
 echo Finalizado.

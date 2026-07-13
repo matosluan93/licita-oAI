@@ -15,12 +15,21 @@ if not exist "%NODE_DIR%\node.exe" (
 set "PATH=%NODE_DIR%;%PATH%"
 cd /d "%PROJECT_DIR%"
 
+if not exist "%PROJECT_DIR%\node_modules\next\dist\bin\next" (
+  echo.
+  echo ERRO: Dependencias da aplicacao web nao encontradas.
+  echo Rode primeiro: 01_INSTALAR_APLICACAO_WEB.bat
+  echo.
+  pause
+  exit /b 1
+)
+
 echo.
 echo Iniciando LicitAI em:
 echo http://localhost:4028/linkedin-sourcing
 echo.
 echo Nao feche esta janela enquanto estiver usando a aplicacao.
 echo.
-"%PNPM%" run dev
+"%NODE_DIR%\node.exe" "%PROJECT_DIR%\node_modules\next\dist\bin\next" dev -p 4028
 
 pause

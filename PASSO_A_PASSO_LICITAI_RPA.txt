@@ -1,287 +1,176 @@
-PASSO A PASSO DETALHADO - COMO RODAR O LICITAI
-==============================================
+﻿PASSO A PASSO ATUALIZADO - LICITAI
+==================================
 
-Este guia foi escrito para quem nao programa.
-Siga na ordem, copiando e colando os comandos no PowerShell.
+Atualizado em: 13/07/2026
 
-
-IMPORTANTE: ONDE RODAR O NPM INSTALL?
--------------------------------------
-
-Voce vai rodar "npm install" em 2 lugares diferentes:
-
-1. Na pasta principal do projeto:
-
-   C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project
-
-   Esse npm install instala a aplicacao web do LicitAI.
-
-2. Na pasta do RPA:
-
-   C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project\rpa\linkedin-sourcer
-
-   Esse npm install instala a automacao do LinkedIn.
-
-Ou seja: sim, tem dois "npm install".
-Cada um deve ser executado dentro da pasta correta.
+Este guia foi feito para uso em maquina corporativa, inclusive quando o comando
+"npm" nao funciona porque o Node.js nao esta instalado globalmente.
 
 
-ANTES DE COMECAR
-----------------
+1. O QUE VOCE VAI USAR
+----------------------
 
-Voce precisa ter instalado no computador:
+O LicitAI tem duas partes:
 
-- Node.js
-- Google Chrome ou Microsoft Edge
-- Uma conta LinkedIn ativa
-- Uma chave da OpenAI, se quiser usar analise real com IA
+1. Aplicacao web
+   Onde voce anexa o edital, analisa com IA e exporta o JSON para o RPA.
 
-Para verificar se o Node.js esta instalado:
+2. RPA LinkedIn
+   Onde voce faz login no LinkedIn e roda a busca de profissionais.
 
-1. Abra o PowerShell.
-2. Digite:
 
-   node -v
+2. CAMINHO DO PROJETO
+---------------------
 
-3. Depois digite:
+O projeto esta nesta pasta:
 
-   npm -v
+C:\Users\lfsantos17\OneDrive - Stefanini\Desktop\Aplicações\LicitAI
 
-Se aparecer uma versao, por exemplo "v20..." e "10...", esta certo.
-Se aparecer erro dizendo que nao reconhece o comando, precisa instalar o Node.js.
 
-IMPORTANTE PARA MAQUINA DA EMPRESA SEM NODE.JS
-----------------------------------------------
+3. SE O NPM NAO FUNCIONA NA SUA MAQUINA
+---------------------------------------
 
-Se a maquina da empresa nao permite instalar Node.js, use os arquivos .bat que ficam nesta pasta:
+Se aparecer erro como:
 
-C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project\scripts-windows
+npm : O termo 'npm' nao e reconhecido...
 
-Eles tentam usar o Node interno do Codex, sem instalar Node globalmente no Windows.
+nao tem problema.
 
-Ordem recomendada:
+Use os arquivos .bat que ficam nesta pasta:
+
+C:\Users\lfsantos17\OneDrive - Stefanini\Desktop\Aplicações\LicitAI\scripts-windows
+
+Esses arquivos tentam usar o Node interno do Codex, sem precisar instalar Node.js
+globalmente no Windows.
+
+
+4. ORDEM RECOMENDADA USANDO OS ARQUIVOS .BAT
+--------------------------------------------
+
+Abra esta pasta no Explorador de Arquivos:
+
+C:\Users\lfsantos17\OneDrive - Stefanini\Desktop\Aplicações\LicitAI\scripts-windows
+
+Depois de dois cliques nos arquivos abaixo, nesta ordem:
 
 1. 00_VERIFICAR_NODE_CODEX.bat
+
+   Serve para verificar se o Node interno do Codex esta disponivel.
+
+   Se esse arquivo der erro dizendo que nao encontrou o Node interno, sera necessario
+   pedir ao TI uma das opcoes abaixo:
+
+   - liberar Node.js LTS oficialmente;
+   - liberar Node.js portable para essa pasta do projeto;
+   - permitir o uso do runtime local do Codex.
+
+
 2. 01_INSTALAR_APLICACAO_WEB.bat
+
+   Instala as dependencias da aplicacao web do LicitAI.
+
+   Rode uma vez.
+   Pode demorar alguns minutos.
+
+
 3. 02_RODAR_APLICACAO_WEB.bat
+
+   Inicia a aplicacao web.
+
+   Quando abrir, acesse:
+
+   http://localhost:4028/linkedin-sourcing
+
+   IMPORTANTE:
+   Nao feche essa janela enquanto estiver usando a tela do LicitAI.
+
+
 4. 03_INSTALAR_RPA_LINKEDIN.bat
+
+   Instala as dependencias do RPA e o navegador Chromium usado pelo Playwright.
+
+   Rode uma vez.
+   Pode demorar alguns minutos.
+
+
 5. 04_LOGIN_LINKEDIN.bat
+
+   Abre o navegador para voce fazer login manual no LinkedIn.
+
+   Faca login normalmente.
+   Aguarde o feed do LinkedIn carregar.
+
+   A sessao fica salva em:
+
+   C:\Users\lfsantos17\OneDrive - Stefanini\Desktop\Aplicações\LicitAI\rpa\linkedin-sourcer\.linkedin-session
+
+   Nao compartilhe essa pasta com ninguem.
+
+
 6. 05_RODAR_RPA_LINKEDIN.bat
 
-Como usar:
+   Roda a automacao.
 
-1. Abra a pasta scripts-windows no Explorador de Arquivos.
-2. De dois cliques no arquivo .bat desejado.
-3. Siga as mensagens que aparecerem na tela.
+   Esse arquivo vai pedir:
 
-Se o arquivo 00_VERIFICAR_NODE_CODEX.bat disser que nao encontrou o Node interno do Codex,
-entao sera necessario pedir ao TI uma destas opcoes:
-
-1. Instalar Node.js LTS oficialmente.
-2. Liberar uma versao portable do Node.js para esta pasta do projeto.
-
-Se os .bat funcionarem, voce nao precisa usar os comandos manuais com npm.
+   - caminho do JSON exportado pela tela do LicitAI;
+   - pasta onde deseja salvar a estrutura de documentos;
+   - se deseja baixar curriculos automaticamente, nao baixar, ou confirmar um por um.
 
 
-PARTE 1 - RODAR A APLICACAO WEB
--------------------------------
+5. COMO GERAR O JSON NA TELA DO LICITAI
+---------------------------------------
 
-1. Abra o PowerShell.
-
-Voce pode fazer assim:
-
-- Aperte a tecla Windows.
-- Digite: PowerShell
-- Clique em "Windows PowerShell".
-
-
-2. Entre na pasta principal do projeto.
-
-Copie e cole este comando:
-
-cd "C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project"
-
-
-3. Crie o arquivo de configuracao .env.
-
-Copie e cole:
-
-copy .env.example .env
-
-
-4. Abra o arquivo .env.
-
-Voce pode abrir pelo Explorador de Arquivos ou pelo Bloco de Notas.
-O arquivo fica aqui:
-
-C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project\.env
-
-Preencha pelo menos:
-
-OPENAI_API_KEY=sua-chave-openai
-NEXT_PUBLIC_SITE_URL=http://localhost:4028
-
-Voce NAO precisa preencher Supabase para rodar localmente.
-Pode deixar assim:
-
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-
-Se quiser salvar documentos direto na pasta sincronizada do OneDrive, configure:
-
-LICITAI_DOCUMENTS_ROOT=C:\Users\lfsantos17\OneDrive - Stefanini\Documents\Time Certificacoes\Pregoes
-
-
-5. Instale a aplicacao web.
-
-ATENCAO: este comando deve ser rodado na pasta principal:
-
-C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project
-
-Comando:
-
-npm install
-
-Espere terminar. Pode demorar alguns minutos.
-
-
-6. Rode a aplicacao web.
-
-Ainda na pasta principal, rode:
-
-npm run dev
-
-Se tudo der certo, vai aparecer um endereco parecido com:
-
-http://localhost:4028
-
-Abra no navegador:
+Na tela:
 
 http://localhost:4028/linkedin-sourcing
 
-Deixe esse PowerShell aberto enquanto estiver usando a aplicacao.
-Se fechar o PowerShell, a aplicacao para.
+Siga:
 
-
-PARTE 2 - USAR A TELA DO LICITAI
---------------------------------
-
-Na tela do LicitAI:
-
-1. Anexe o edital em PDF ou cole o texto do edital.
-2. Informe o nome do cliente da licitacao.
+1. Anexe o edital em PDF ou cole o texto.
+2. Informe o cliente da licitacao.
 3. Selecione as empresas do grupo Stefanini.
 4. Clique para analisar o edital.
-5. Revise os cargos, perfis e quantidades.
-6. Clique para exportar a configuracao do RPA.
+5. Revise cargos, perfis e quantidades.
+6. Exporte a configuracao para o RPA.
 
-A aplicacao vai gerar um arquivo JSON.
-Normalmente ele vai para a pasta Downloads.
+O arquivo exportado normalmente vai para a pasta Downloads.
 
 Exemplo:
 
 C:\Users\lfsantos17\Downloads\linkedin-campaign-123.json
 
-Guarde o caminho desse arquivo, porque ele sera usado no RPA.
+Esse e o caminho que voce vai informar no arquivo:
+
+05_RODAR_RPA_LINKEDIN.bat
 
 
-PARTE 3 - PREPARAR O RPA DO LINKEDIN
-------------------------------------
-
-1. Abra OUTRO PowerShell.
-
-Nao feche o primeiro PowerShell onde esta rodando "npm run dev".
-
-
-2. Entre na pasta do RPA.
-
-Copie e cole:
-
-cd "C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project\rpa\linkedin-sourcer"
-
-
-3. Instale as dependencias do RPA.
-
-ATENCAO: este npm install deve ser rodado na pasta do RPA:
-
-C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project\rpa\linkedin-sourcer
-
-Comando:
-
-npm install
-
-Espere terminar.
-
-
-4. Instale o navegador do Playwright.
-
-Ainda na pasta do RPA, rode:
-
-npx playwright install chromium
-
-
-PARTE 4 - FAZER LOGIN NO LINKEDIN
+6. PASTA DE DOCUMENTOS / ONEDRIVE
 ---------------------------------
 
-Na primeira vez, rode:
+Quando o script perguntar a pasta de documentos, voce pode informar a pasta
+sincronizada do OneDrive/SharePoint.
 
-npm run login
+Exemplo:
 
-Vai abrir uma janela de navegador.
+C:\Users\lfsantos17\OneDrive - Stefanini\Documents\Time Certificacoes\Pregoes
 
-Faca login manualmente no LinkedIn.
-Espere o feed do LinkedIn carregar.
+O RPA cria dentro dela a estrutura:
 
-A sessao ficara salva nesta pasta:
+Pregoes 2026\Julho\<Cliente>\<Perfil>\<Profissional>
 
-C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project\rpa\linkedin-sourcer\.linkedin-session
+Dentro da pasta do profissional ficam:
 
-Nao compartilhe essa pasta com ninguem.
-Ela representa sua sessao logada.
-
-
-PARTE 5 - RODAR A AUTOMACAO
----------------------------
-
-Depois que voce exportar o JSON pela tela do LicitAI, rode o RPA.
-
-Exemplo basico:
-
-npm run search -- --config "C:\Users\lfsantos17\Downloads\linkedin-campaign.json"
-
-IMPORTANTE:
-Troque o caminho acima pelo caminho real do arquivo JSON que voce baixou.
+- curriculo baixado, quando disponivel;
+- perfil-linkedin.txt com dados e link do perfil.
 
 
-Exemplo salvando documentos direto no OneDrive sincronizado:
+7. RESULTADOS GERADOS PELO RPA
+------------------------------
 
-npm run search -- --config "C:\Users\lfsantos17\Downloads\linkedin-campaign.json" --documents-root "C:\Users\lfsantos17\OneDrive - Stefanini\Documents\Time Certificacoes\Pregoes"
+O RPA tambem gera arquivos nesta pasta:
 
-
-PARTE 6 - OPCOES UTEIS DO RPA
------------------------------
-
-Rodar sem baixar curriculos, gerando apenas Excel e links:
-
-npm run search -- --config "C:\Users\lfsantos17\Downloads\linkedin-campaign.json" --no-resume-downloads
-
-
-Confirmar cada curriculo antes de baixar:
-
-npm run search -- --config "C:\Users\lfsantos17\Downloads\linkedin-campaign.json" --confirm-downloads
-
-
-Combinar OneDrive com confirmacao de download:
-
-npm run search -- --config "C:\Users\lfsantos17\Downloads\linkedin-campaign.json" --documents-root "C:\Users\lfsantos17\OneDrive - Stefanini\Documents\Time Certificacoes\Pregoes" --confirm-downloads
-
-
-PARTE 7 - ONDE FICAM OS RESULTADOS
-----------------------------------
-
-O RPA gera arquivos nesta pasta:
-
-C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project\rpa\linkedin-sourcer\output
+C:\Users\lfsantos17\OneDrive - Stefanini\Desktop\Aplicações\LicitAI\rpa\linkedin-sourcer\output
 
 Arquivos principais:
 
@@ -290,139 +179,140 @@ licitacao-<campaignId>.xlsx
 audit-log.ndjson
 daily-usage.json
 
-
-O arquivo Excel e o principal para visualizar:
+O Excel e o arquivo mais facil para visualizar:
 
 licitacao-<campaignId>.xlsx
 
-Ele tera os cargos, quantidades e links dos perfis.
-
-
-O arquivo JSON serve para importar de volta na tela do LicitAI:
+O JSON serve para importar de volta na tela:
 
 results-<campaignId>.json
 
 
-PARTE 8 - ESTRUTURA DE PASTAS DOS PROFISSIONAIS
------------------------------------------------
+8. IMPORTAR RESULTADOS NA TELA
+------------------------------
 
-Se voce informou --documents-root, a estrutura sera criada na pasta indicada.
-
-Exemplo:
-
-C:\Users\lfsantos17\OneDrive - Stefanini\Documents\Time Certificacoes\Pregoes\Pregoes 2026\Julho\<Cliente>\<Perfil>\<Profissional>
-
-Dentro da pasta de cada profissional ficam:
-
-- curriculo baixado, quando disponivel;
-- perfil-linkedin.txt com dados do perfil e link do LinkedIn.
-
-
-PARTE 9 - IMPORTAR RESULTADOS NA TELA
--------------------------------------
-
-Volte para a tela:
+Volte para:
 
 http://localhost:4028/linkedin-sourcing
 
-Importe o arquivo:
+Importe:
 
 results-<campaignId>.json
 
-A tela vai mostrar os perfis encontrados e o ranking de aderencia.
+A tela mostra os perfis encontrados e o ranking de aderencia.
 
 
-PARTE 10 - CONTROLES DO RPA
----------------------------
+9. CONTROLES DO RPA
+-------------------
 
-O RPA ja vem com alguns cuidados:
+O RPA esta configurado com:
 
 - busca somente dentro do LinkedIn;
-- bloqueia acesso fora de linkedin.com e licdn.com;
+- bloqueio de acesso fora de linkedin.com e licdn.com;
 - limite de 30 perfis por execucao;
 - limite diario de 100 perfis salvos;
 - pausa maior a cada 8 perfis;
-- para automaticamente se aparecer captcha, checkpoint ou verificacao de seguranca;
-- gera log de auditoria em output/audit-log.ndjson.
+- parada automatica em captcha, checkpoint ou verificacao de seguranca;
+- log de auditoria em output/audit-log.ndjson.
 
 
-SE DER ERRO
------------
+10. SE DER ERRO
+---------------
 
-1. Se aparecer erro de npm ou node:
+Erro: "npm nao e reconhecido"
 
-   Verifique se o Node.js esta instalado.
+Use os arquivos .bat da pasta:
 
-2. Se a aplicacao nao abrir:
-
-   Confira se o terminal com "npm run dev" continua aberto.
-
-3. Se o LinkedIn pedir login:
-
-   Rode novamente:
-
-   npm run login
-
-4. Se o LinkedIn pedir captcha ou checkpoint:
-
-   Pare a automacao.
-   Resolva manualmente no navegador.
-   Depois rode novamente.
-
-5. Se o caminho do JSON estiver errado:
-
-   Confira se o arquivo existe na pasta Downloads.
-   Use o caminho completo entre aspas.
+C:\Users\lfsantos17\OneDrive - Stefanini\Desktop\Aplicações\LicitAI\scripts-windows
 
 
-RESUMO RAPIDO DOS COMANDOS
---------------------------
+Erro: "ERR_PNPM_IGNORED_BUILDS"
+
+Esse erro pode aparecer durante a instalacao porque o pnpm interno bloqueia alguns
+build scripts de dependencias.
+
+Os scripts .bat atualizados contornam isso chamando o Node diretamente nos binarios
+locais do projeto.
+
+Se aparecer durante o arquivo 01_INSTALAR_APLICACAO_WEB.bat, veja se ele encontrou
+a pasta node_modules depois. Se encontrou, rode:
+
+02_RODAR_APLICACAO_WEB.bat
+
+Se aparecer durante o arquivo 02_RODAR_APLICACAO_WEB.bat, atualize os scripts .bat
+com a versao mais recente deste projeto.
+
+
+Erro: "Node interno do Codex nao encontrado"
+
+PeÃ§a ao TI para liberar Node.js LTS ou Node portable.
+
+
+Erro: a tela nao abre
+
+Verifique se o arquivo abaixo continua aberto:
+
+02_RODAR_APLICACAO_WEB.bat
+
+Se ele foi fechado, abra novamente.
+
+
+Erro: LinkedIn pediu login
+
+Rode novamente:
+
+04_LOGIN_LINKEDIN.bat
+
+
+Erro: LinkedIn pediu captcha/checkpoint
+
+Pare a automacao.
+Resolva manualmente no navegador.
+Depois rode novamente.
+
+
+Erro: arquivo JSON nao encontrado
+
+Confira o caminho do JSON na pasta Downloads.
+Use sempre o caminho completo.
+
+Exemplo:
+
+C:\Users\lfsantos17\Downloads\linkedin-campaign-123.json
+
+
+11. ALTERNATIVA MANUAL COM NPM
+------------------------------
+
+Use esta parte somente se o comando "npm" funcionar na maquina.
 
 Aplicacao web:
 
-cd "C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project"
+cd "C:\Users\lfsantos17\OneDrive - Stefanini\Desktop\Aplicações\LicitAI"
 npm install
 npm run dev
 
 
 RPA:
 
-cd "C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project\rpa\linkedin-sourcer"
+cd "C:\Users\lfsantos17\OneDrive - Stefanini\Desktop\Aplicações\LicitAI\rpa\linkedin-sourcer"
 npm install
 npx playwright install chromium
 npm run login
 npm run search -- --config "C:\Users\lfsantos17\Downloads\linkedin-campaign.json"
 
 
-RESUMO RAPIDO USANDO OS ARQUIVOS .BAT
--------------------------------------
+12. RESUMO MAIS CURTO
+---------------------
 
-Se o comando npm nao funciona na sua maquina, use esta ordem:
+Se voce nao sabe programar, use apenas os arquivos .bat:
 
-1. Abra:
+1. scripts-windows\00_VERIFICAR_NODE_CODEX.bat
+2. scripts-windows\01_INSTALAR_APLICACAO_WEB.bat
+3. scripts-windows\02_RODAR_APLICACAO_WEB.bat
+4. scripts-windows\03_INSTALAR_RPA_LINKEDIN.bat
+5. scripts-windows\04_LOGIN_LINKEDIN.bat
+6. scripts-windows\05_RODAR_RPA_LINKEDIN.bat
 
-   C:\Users\lfsantos17\OneDrive - Stefanini\Documents\New project\scripts-windows
+Essa e a forma mais simples para a sua maquina corporativa.
 
-2. De dois cliques em:
-
-   00_VERIFICAR_NODE_CODEX.bat
-
-3. Se estiver tudo certo, rode:
-
-   01_INSTALAR_APLICACAO_WEB.bat
-
-4. Depois rode:
-
-   02_RODAR_APLICACAO_WEB.bat
-
-5. Em seguida rode:
-
-   03_INSTALAR_RPA_LINKEDIN.bat
-
-6. Depois rode:
-
-   04_LOGIN_LINKEDIN.bat
-
-7. Depois de exportar o JSON pela tela do LicitAI, rode:
-
-   05_RODAR_RPA_LINKEDIN.bat

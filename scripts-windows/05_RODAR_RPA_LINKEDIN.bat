@@ -16,6 +16,15 @@ if not exist "%NODE_DIR%\node.exe" (
 set "PATH=%NODE_DIR%;%PATH%"
 cd /d "%RPA_DIR%"
 
+if not exist "%RPA_DIR%\node_modules\tsx\dist\cli.mjs" (
+  echo.
+  echo ERRO: Dependencias do RPA nao encontradas.
+  echo Rode primeiro: 03_INSTALAR_RPA_LINKEDIN.bat
+  echo.
+  pause
+  exit /b 1
+)
+
 echo.
 echo Cole abaixo o caminho completo do JSON exportado pela tela do LicitAI.
 echo Exemplo: C:\Users\lfsantos17\Downloads\linkedin-campaign-123.json
@@ -53,9 +62,9 @@ echo.
 echo Iniciando RPA...
 echo.
 if "%DOCS_ROOT%"=="" (
-  "%PNPM%" run search -- --config "%CONFIG_PATH%" %DOWNLOAD_ARG%
+  "%NODE_DIR%\node.exe" "%RPA_DIR%\node_modules\tsx\dist\cli.mjs" src/search.ts --config "%CONFIG_PATH%" %DOWNLOAD_ARG%
 ) else (
-  "%PNPM%" run search -- --config "%CONFIG_PATH%" --documents-root "%DOCS_ROOT%" %DOWNLOAD_ARG%
+  "%NODE_DIR%\node.exe" "%RPA_DIR%\node_modules\tsx\dist\cli.mjs" src/search.ts --config "%CONFIG_PATH%" --documents-root "%DOCS_ROOT%" %DOWNLOAD_ARG%
 )
 
 pause
