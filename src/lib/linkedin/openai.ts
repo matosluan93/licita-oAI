@@ -11,6 +11,7 @@ export async function completeJson<T>({
 }): Promise<T> {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
+    signal: AbortSignal.timeout(30_000),
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
@@ -28,8 +29,7 @@ export async function completeJson<T>({
   });
 
   if (!response.ok) {
-    const details = await response.text();
-    throw new Error(`OpenAI retornou ${response.status}: ${details}`);
+    throw new Error("Falha no serviço de análise.");
   }
 
   const data = await response.json();

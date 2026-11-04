@@ -69,3 +69,9 @@ Dentro da pasta de cada profissional ficam o curriculo baixado, quando houver, e
 ## Observacoes legais
 
 A automacao do LinkedIn pode contrariar termos da plataforma. Use apenas em contexto autorizado, com baixo volume, e respeitando LGPD e politicas internas.
+
+### Acesso à aplicação
+
+A instalação padrão atende localmente. Para publicação via proxy HTTPS, configure
+LICITAI_PUBLIC_ORIGIN com a origem pública e LICITAI_ACCESS_PASSWORD com uma senha
+aleatória de pelo menos 16 caracteres. O usuário do acesso HTTP Basic é licitai.

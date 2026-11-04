@@ -1,19 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readJson, requestError } from '@/lib/linkedin/request-body';
 import { completeJson } from '@/lib/linkedin/openai';
 import { scoreProfile } from '@/lib/linkedin/scoring';
 import type { EditalRequirements, LinkedInProfileResult, RpaExportPayload } from '@/lib/linkedin/types';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await readJson(request);
     const { payload, requirements, rescoreWithAi = false } = body as {
       payload: RpaExportPayload;
       requirements: EditalRequirements;
       rescoreWithAi?: boolean;
     };
 
-    if (!payload?.profiles?.length) {
-      return NextResponse.json({ error: 'Nenhum perfil encontrado no arquivo importado.' }, { status: 400 });
+    if (!Array.isArray(payload?.profiles) || !payload.profiles.length || payload.profiles.length > 100) {
+      return NextResponse.json({ error: 'O arquivo deve conter entre 1 e 100 perfis.' }, { status: 400 });
+    }
+
+    if (!requirements || ![requirements.competenciasTecnicas, requirements.keywordsLinkedIn, requirements.certificacoes]
+      .every(values => Array.isArray(values) && values.every(value => typeof value === "string")) ||
+      payload.profiles.some(profile => !profile || typeof profile.name !== "string" ||
+        [profile.experience, profile.skills].some(value => value != null && !Array.isArray(value)))) {
+      return NextResponse.json({ error: "Perfis ou requisitos inválidos." }, { status: 400 });
     }
 
     let profiles: LinkedInProfileResult[] = payload.profiles.map((profile, index) => {
@@ -39,10 +47,7 @@ export async function POST(request: NextRequest) {
       profiles,
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Falha ao importar resultados.', details: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return requestError(error, "Falha ao importar resultados.");
   }
 }
 

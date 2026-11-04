@@ -20,3 +20,7 @@ rpa/linkedin-sourcer/.linkedin-session/
 rpa/linkedin-sourcer/output/
 rpa/linkedin-sourcer/downloads/
 rpa/linkedin-sourcer/node_modules/
+
+# Artefatos locais de ferramentas
+supabase/.temp/
+*.tsbuildinfo

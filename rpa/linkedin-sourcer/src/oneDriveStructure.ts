@@ -142,5 +142,7 @@ function safePathSegment(value: string): string {
     .replace(/[<>:"/\\|?*\x00-\x1F]/g, '_')
     .replace(/\s+/g, ' ')
     .trim();
-  return cleaned.slice(0, 120) || 'Sem nome';
+  const segment = cleaned.slice(0, 120).replace(/[. ]+$/, '');
+  if (!segment || /^(?:CON|PRN|AUX|NUL|COM[1-9¹²³]|LPT[1-9¹²³])(?:\.|$)/i.test(segment)) return 'Sem nome';
+  return segment;
 }
