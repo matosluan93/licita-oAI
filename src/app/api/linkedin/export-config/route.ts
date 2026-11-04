@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readJson, requestError } from '@/lib/linkedin/request-body';
 import { getCompaniesByIds } from '@/lib/linkedin/stefaniniCompanies';
 import type { RpaSearchConfig } from '@/lib/linkedin/types';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await readJson(request);
     const {
       campaignId,
       campaignName,
@@ -15,9 +16,9 @@ export async function POST(request: NextRequest) {
       delayBetweenProfilesMs = 6500,
       headless = false,
       safety = {},
-    } = body;
+    } = body as Partial<RpaSearchConfig> & { companyIds?: string[] };
 
-    if (!requirements || !companyIds?.length) {
+    if (!requirements || !Array.isArray(companyIds) || !companyIds.length || !companyIds.every(id => typeof id === "string")) {
       return NextResponse.json({ error: 'requirements e companyIds sao obrigatorios.' }, { status: 400 });
     }
 
@@ -46,9 +47,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(config);
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Falha ao gerar configuracao RPA.', details: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return requestError(error, "Falha ao gerar configuração RPA.");
   }
 }

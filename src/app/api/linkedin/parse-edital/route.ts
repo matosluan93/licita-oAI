@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readJson, requestError } from '@/lib/linkedin/request-body';
 import { extractRequirementsHeuristically } from '@/lib/linkedin/heuristics';
 import { completeJson } from '@/lib/linkedin/openai';
 import { buildBooleanSearchQuery, getCompaniesByIds } from '@/lib/linkedin/stefaniniCompanies';
@@ -32,8 +33,12 @@ async function extractTextFromBody(body: {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await readJson(request);
     const { companyIds = [] } = body as { companyIds?: string[] };
+    if (!Array.isArray(companyIds) || !companyIds.every(id => typeof id === "string") ||
+        ["editalText", "editalBase64", "filename"].some(key => body[key] != null && typeof body[key] !== "string")) {
+      return NextResponse.json({ error: "Campos do edital inválidos." }, { status: 400 });
+    }
     const companies = getCompaniesByIds(companyIds);
     const text = await extractTextFromBody(body);
 
@@ -85,9 +90,6 @@ export async function POST(request: NextRequest) {
       mode: apiKey ? 'ai' : 'heuristic',
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Falha ao analisar edital.', details: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return requestError(error, "Falha ao analisar edital.");
   }
 }
